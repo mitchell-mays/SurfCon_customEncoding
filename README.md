@@ -45,7 +45,7 @@ Step 2: Training the final ranking model:
         > bash train_surfcon.sh
 
 
-If you have any questions, please feel free to contact us! Also, feel free to check other tools in our group (https://github.com/sunlab-osu). 
+If you have any questions, please feel free to contact us! Also, feel free to check other tools in our group (https://github.com/sunlab-osu) :)
 
 ## 4. Citation
 ```
