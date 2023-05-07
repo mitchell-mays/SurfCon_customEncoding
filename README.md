@@ -1,59 +1,28 @@
-# SurfCon
-Implementation of SurfCon model for Paper "[SurfCon: Synonym Discovery on Privacy-Aware Clinical Data](https://arxiv.org/abs/1906.09285)", which studies Synonym Discovery on Privacy-Aware Clinical Data.
+# CS598 Deep Learning for Healthcare Project - Reproduction of SurfCon
+Reproduction of SurfCon model for Paper "[SurfCon: Synonym Discovery on Privacy-Aware Clinical Data](https://arxiv.org/abs/1906.09285)", which studies Synonym Discovery on Privacy-Aware Clinical Data.
 
-## 1. Introduction
-This repository is the implementation for the SurfCon model that utilizes the surface form and global context information to mine synonyms for medical terms extracted from clinical texts, such as Electronic Medical Records (EMRs).
+## 1. Reproducability Summary
+This project recreates the work done in the above paper. The goal of the paper is to utilize aggregated Co-frequency data of medical terms from Clinical Notes as an indicator of relationships between these terms. For this paper, the authors demonstrated the ability to identify synonymous terms (indicated by alignment under the same UMLS Concept). Our team was able to reproduce positive results akin to to the results seen by the authors of the Surfcon Paper. We reproduced two of the expirements done by the authors, with a slight variation of datasets. The character based pre-trained embeddings utilized by the original authors were unavailable, and therefore we identified and utilized a different subword embeddings instead.
 
-The surface form information provides connections between medical terms in the surface form level. Not surprisingly, the surface form information is critical in the medical domain. For example, term **hypocupremia** is the synonym of **copper deficiency** in which _hypo_ means _deficiency_, _cupre_ means _copper_ and _mia_ is connected with _blood_. Inspired by such intuition, we design a bi-level surface form encoder to capture the information in both character and word levels of the medical terms.
+## 2. Description & Context
+While the Authors did make code available for the models and training, modifications were required for the following key elements:
 
-Moreover, the global context information provides semantic information between medical terms. To deal with OOV problem (e.g., query terms do not show up in existing data), we leverage an inductive context prediction module to predict the close neighbors for terms and aggregate the predicted neighbors to calculate a context score between terms. 
+#### 1. Data loading
+#### 2. Data pre-processing
+#### 3. Transform data structure for inputs
+#### 4. Implement PPMI algorithm to convert frequency to PPMI
+#### 5. Implement subsampling algorithm
+#### 6. Map & Create synonym graph for labels
+#### 7. Update outdated packages
+Additionally, as the character based (surface form) pre-trained embedding was not available, we worked with the authors to find a suitable alternative (see below), and wrote code to pre-process this data as the structure of the datasets differed.
 
-Please refer to our paper for more detailed information.
-
-## 2. Dataset
-The dataset used in current experiments contains medical term-term co-occurrence graphs extracted from EMRs. The dataset can be downloaded from the original paper, [Building the graph of medicine from millions of clinical narratives](https://datadryad.org/resource/doi:10.5061/dryad.jp917)
-
-More importantly, you can apply our model to your own data. Our model and problem setting can be extended to any other text corpus with the privacy concerns as long as a co-occurrence graph is provided.
-
-
-
-## 3. Run
-
-### Testing
-
-1. For testing our pretrained SurfCon model to discover synonyms, please download the [pretrained model and parameters](https://drive.google.com/file/d/1126dtSV4XI_FWP4l0hUogijjUimRYIEF/view?usp=sharing) and ensure the correct file paths.
-
-2. The pretrained embeddings can be downloaded here: [GloVe](http://nlp.stanford.edu/data/glove.6B.zip), [charNgram](http://www.logos.t.u-tokyo.ac.jp/~hassy/publications/arxiv2016jmt/jmt_pre-trained_embeddings.tar.gz), [node features](https://drive.google.com/file/d/1nKXDppoSsT6uHCl0yG_zlrC4QFyCyu41/view?usp=sharing).
-
-3. If you want to test quickly with existing medicla terms, please refer to [here](https://drive.google.com/file/d/1RN0x45dnMAkRKQWAwIqoz2qNL_3hfsQv/view?usp=sharing) and put them in the corresponding path of *data* folder. If you have your own terms, please reivse the argument `--cand_terms_path` in `test_surfcon.sh` with a text file (one term per line).
-
-4. Testing our pretrained SurfCon model to discover synonyms:
-
-        > bash test_surfcon.sh
-
-### Training
-
-Steps for trianing the model from scratch:
-
-Step 1: Training the inductive context prediction model:
-
-        > bash train_ctx_pred.sh
-        
-
-Step 2: Training the final ranking model:
-
-        > bash train_surfcon.sh
+Therefore, the referenced code includes a combination of the authors original code, modifications made by our team, and new code generated by our team.
 
 
-If you have any questions, please feel free to contact us! Also, feel free to check other tools in our group (https://github.com/sunlab-osu) :blush:
+## 3. Testing
 
-## 4. Citation
-```
-@inproceedings{wang2019surfcon,
-  title={SurfCon: Synonym Discovery on Privacy-Aware Clinical Data},
-  author={Wang, Zhen and Yue, Xiang and Moosavinasab, Soheil and Huang, Yungui and Lin, Simon and Sun, Huan},
-  booktitle={Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery \& Data Mining},
-  year={2019},
-  organization={ACM}
-}
-```
+Refer to the notebook cs598_execution.ipynb under src folder which has detailed instructions to pre-process data, train and test the models.
+To test/run this code, note the instructions about data and compute requirements as mentioned in the cs598_execution.ipynb. 
+
+
+
