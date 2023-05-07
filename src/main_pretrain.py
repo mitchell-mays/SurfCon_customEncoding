@@ -24,32 +24,41 @@ import loader
 
 def make_idx_data_term(dataset, args):
     data = []  # [(node_id, [(node_id1, ppmi?count?), (node_id2, ppmi?count?), ...]), (), ...]
+    count = 0
     for cur_sample in dataset:
         cur_dict = {}
-        cur_dict['id'] = cur_sample[0]
-        cur_dict['str'] = args.term_strings[cur_sample[0]]
+        cur_sample_key = int(cur_sample[0])
+        cur_dict['id'] = cur_sample_key
+        cur_dict['str'] = args.term_strings[cur_sample_key]
+
 
         ngram_ids = []
-        for g in utils.get_single_ngrams(args.term_strings[cur_sample[0]], args.n_grams):
+        for g in utils.get_single_ngrams(args.term_strings[cur_sample_key], args.n_grams):
             if g in args.ngram_to_id:
                 ngram_ids.append(args.ngram_to_id[g])
         if ngram_ids is []:
             ngram_ids.append(args.ngram_to_id['<UNK>'])
         cur_dict['ngram_ids'] = ngram_ids
 
-        word_list = args.term_strings[cur_sample[0]].split()
+        word_list = args.term_strings[cur_sample_key].split()
         cur_dict['word_ids'] = [args.word_to_id[w if w in args.word_to_id else '<UNK>'] for w in word_list]
         cur_dict['word_len'] = len(word_list)
 
         # one-hot labels
         label_vec = np.zeros(args.node_vocab_size)
         for y in cur_sample[1]:
-            if y[0] in args.node_to_id:
-                label_vec[args.node_to_id[y[0]]] = y[1]
-                # label_vec[args.node_to_id[y[0]]] = 1
-        cur_dict['y'] = label_vec / np.sum(label_vec)
-
-        data.append(cur_dict)
+            if int(y[0]) in args.node_to_id:
+                label_vec[args.node_to_id[int(y[0])]] = y[1]
+                #label_vec[args.node_to_id[y[0]]] = 1
+        
+        if (np.sum(label_vec) == 0):
+            count += 1
+        else:
+            cur_dict['y'] = label_vec / np.sum(label_vec) 
+            data.append(cur_dict)
+    
+    print(count)
+    print(len(data))
     return data
 
 
@@ -172,7 +181,11 @@ def main():
     # global variables
     args.cuda = torch.cuda.is_available()
 
+    # Load ID to Term dictionary into 'term_strings '
     args.term_strings = pickle.load(open('../data/mappings/term_string_mapping.pkl', 'rb'))
+
+    # Load Cofrequency PPMI array into dataset
+    #   - Format # [(node_id, [(node_id1, ppmi), (node_id2, ppmi), ...]), (), ...]
     dataset = pickle.load(open('../data/sym_data/sub_neighbors_dict_ppmi_per' + args.per + '_' + args.days + '.pkl', 'rb'))
 
     # prepare context labels
@@ -180,7 +193,7 @@ def main():
     print('Total number of candidates: ', len(context_terms))
 
     reuse_stored_path = './saved_models/{0}_{1}_pretrain_model_dict.pkl'.format(args.per, args.days)
-    if os.path.exists(reuse_stored_path):
+    if False: #os.path.exists(reuse_stored_path):
         model_dict = pickle.load(open(reuse_stored_path, 'rb'))
         # output
         args.node_to_id = model_dict['node_to_id']
@@ -201,10 +214,13 @@ def main():
         print('Pre-stored parameters loaded!')
     else:
         # data pre-processing
+
+        # NodeID to ID dictionary for mapping nodeID to row number
         args.node_to_id = {node: idx for idx, node in enumerate(context_terms)}
+
+        # ID to NodeID dictionary for mapping row number to NodeID
         args.id_to_node = {idx: node for node, idx in args.node_to_id.items()}
         args.node_vocab_size = len(args.node_to_id)
-        args.node_embed_dim = args.node_embed_dim
 
         args.n_grams = [int(x) for x in args.n_grams.split(',')]
         list_words = list(set([x for x in args.term_strings.values()]))
@@ -241,21 +257,6 @@ def main():
         print('Model Parameters Stored!')
 
     # optimizer and loss function
-    '''
-    model = encoder_models.ContextPredictionWordNGram(args)
-    if args.cuda:
-        model = model.cuda()
-    print(model)
-
-    pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print('Total # parameter: {0} w/ embeddings'.format(pytorch_total_params))
-
-    pytorch_total_params = sum(p.numel() for name, p in model.named_parameters()
-                               if p.requires_grad and name.count('embeddings') == 0)
-    print('Total # parameter: {0} w/o embeddings'.format(pytorch_total_params))
-
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)    
-    '''
     if args.neg_sampling:
         degree_list = pickle.load(open('../data/sym_data/degree_list_perBin_1.pkl', 'rb'))
         weights = np.zeros(args.node_vocab_size)
@@ -326,6 +327,15 @@ def main():
         if args.cuda:
             model = model.cuda()
         print(model)
+
+        #
+        #load current state model
+        #
+        #if os.path.exists('./saved_models/saved_pretrained_res/snapshot_epoch_709.pt'):    
+        #    model.load_state_dict(torch.load('./saved_models/saved_pretrained_res/snapshot_epoch_709.pt'), strict=True)
+        #    print("Loaded original model")
+        #
+
         optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 
         # dataset splitting
@@ -339,7 +349,7 @@ def main():
         last_epoch = 0
         best_loss = np.inf
         num_batches = len(train) // args.batch_size
-        print('Begin trainning...')
+        print('Begin training...')
         model.train()
         for epoch in range(args.num_epochs):
             steps = 0

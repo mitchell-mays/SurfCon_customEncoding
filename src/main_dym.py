@@ -62,7 +62,7 @@ parser.add_argument("--embed_filename", type=str, default='../data/embeddings/gl
 parser.add_argument('--node_embed_path', type=str, default='../data/embeddings/line2nd_ttcooc_embedding.txt')
 parser.add_argument('--ngram_embed_path', type=str, default='../data/embeddings/charNgram.txt')
 # parser.add_argument('--restore_para_file', type=str, default='./final_pretrain_cnn_model_parameters.pkl')
-parser.add_argument('--restore_model_path', type=str, required=True, default='')
+parser.add_argument('--restore_model_path', type=str, required=False, default='')
 parser.add_argument('--restore_idx_data', type=str, default='')
 parser.add_argument("--logging", type='bool', default=False)
 parser.add_argument("--log_name", type=str, default='empty.txt')
@@ -74,6 +74,9 @@ parser.add_argument("--save_interval", type=int, default=5, help='intervals for 
 parser.add_argument('--random_test', type='bool', default=True)
 parser.add_argument('--neg_sampling', type='bool', default=False)
 parser.add_argument('--num_negs', type=int, default=5)
+
+# Added rank model path for continuing training
+parser.add_argument('--rank_model_path', type=str)
 
 args = parser.parse_args()
 print('args: ', args)
@@ -95,7 +98,7 @@ torch.manual_seed(args.random_seed)
 args.restore_para_file = './saved_models/{0}_{1}_pretrain_model_dict.pkl'.format(args.per, args.days)
 # path to store
 args.save_dir = './saved_models/rank_model_per{0}_{1}'.format(args.per, args.days)
-# print(args.save_dir)
+print(args.save_dir)
 
 # global parameters
 args.term_strings = pickle.load(open('../data/mappings/term_string_mapping.pkl', 'rb'))
@@ -105,12 +108,11 @@ args.all_iv_terms = pickle.load(open('../data/sym_data/all_iv_terms_per{0}_{1}.p
 args.neighbors = []
 
 args.cuda = torch.cuda.is_available()
-# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # loading data
 print('Begin loading data ...')
-train_graph = nx.read_gpickle('../data/sym_data/train_graph_nx_per' + args.per + '_' + args.days + '.gpickle')
-test_graph = nx.read_gpickle('../data/sym_data/test_graph_nx_per' + args.per + '_' + args.days + '.gpickle')
+train_graph = pickle.load(open('../data/sym_data/train_graph_nx_per' + args.per + '_' + args.days + '.pkl', 'rb'))
+test_graph = pickle.load(open('../data/sym_data/test_graph_nx_per' + args.per + '_' + args.days + '.pkl', 'rb'))
 train_multi = [(x, list(train_graph.adj[x])) for x in train_graph.nodes]
 test_multi = [(x, list(test_graph.adj[x])) for x in test_graph.nodes]
 
@@ -125,30 +127,16 @@ print('Data: # train: {0}, # val: {1}, # iv test: {2}, # dis iv test {3}'.format
                                                                                  len(dev_pos),
                                                                                  len(iv_test_pos),
                                                                                  len(dis_iv_pos)))
-# print('Sum # pos: train: {0}, val: {1}, iv test: {2}, '
-#       'dis iv test {3}'.format(np.sum([len(x[1]) for x in train_pos]),
-#                                np.sum([len(x[1]) for x in dev_pos]),
-#                                np.sum([len(x[1]) for x in iv_test_pos]),
-#                                np.sum([len(x[1]) for x in dis_iv_pos])))
-#
-# print('Average # pos: train: {0:.3}, val: {1:.3}, iv test: {2:.3}, '
-#       'dis iv test {3:.3}'.format(np.mean([len(x[1]) for x in train_pos]),
-#                                   np.mean([len(x[1]) for x in dev_pos]),
-#                                   np.mean([len(x[1]) for x in iv_test_pos]),
-#                                   np.mean([len(x[1]) for x in dis_iv_pos])))
 
-all_oov_test = pickle.load(open('../data/sym_data/oov_test_dict_per' + args.per + '_' + args.days + '.pkl', 'rb'))
-all_oov_test = list(all_oov_test.items())
-np.random.shuffle(all_oov_test)
+##########################
+# CS598
+# For the purposes of our experiments. The training/testing 
+# portions that utilize OOV terms are commented out.
+##########################
 
-oov_test_pos = all_oov_test[:args.num_oov]
-dis_oov_pos = utils.filter_sim_terms(oov_test_pos, args.term_strings)
-
-# print('# oov test: {0}, average # pos: {1:3}, sum # pos: {2}'.format(
-#     len(oov_test_pos), np.mean([len(x[1]) for x in oov_test_pos]), np.sum([len(x[1]) for x in oov_test_pos])))
-#
-# print('# dis oov test: {0}, average # pos: {1:.3}, sum # pos: {2}'.format(
-#     len(dis_oov_pos), np.mean([len(x[1]) for x in dis_oov_pos]), np.sum([len(x[1]) for x in dis_oov_pos])))
+oov_test_pos = []
+#dis_oov_pos = utils.filter_sim_terms(oov_test_pos, args.term_strings)
+dis_oov_pos = []
 
 reuse_oov_path = '../data/sym_data/dev_test_data_per{0}_{1}_{2}.pkl'.format(args.per, args.days, args.num_oov)
 if os.path.exists(reuse_oov_path):
@@ -176,7 +164,7 @@ print('Data loaded!')
 # data pre-processing
 restore_para_file = './saved_models/{0}_{1}_pretrain_model_dict.pkl'.format(args.per, args.days)
 if os.path.exists(restore_para_file):
-    model_dict = pickle.load(open(args.restore_para_file, 'rb'))
+    model_dict = pickle.load(open(restore_para_file, 'rb'))
     # print('Model Parameters: ', model_dict.keys())
     # output
     args.node_to_id = model_dict['node_to_id']
@@ -207,16 +195,22 @@ print('Begin digitalizing ...')
 dev_idx = utils.make_idx_data(dev, args)
 iv_test_idx = utils.make_idx_data(iv_test, args)
 dis_iv_test_idx = utils.make_idx_data(dis_iv_test, args)
-oov_test_idx = utils.make_idx_data(oov_test, args)
-dis_oov_test_idx = utils.make_idx_data(dis_oov_test, args)
+#oov_test_idx = utils.make_idx_data(oov_test, args)
+#dis_oov_test_idx = utils.make_idx_data(dis_oov_test, args)
 
-print(len(dev_idx), len(iv_test_idx), len(dis_iv_test), len(oov_test_idx), len(dis_oov_test_idx))
+#print(len(dev_idx), len(iv_test_idx), len(dis_iv_test), len(oov_test_idx), len(dis_oov_test_idx))
+print(len(dev_idx), len(iv_test_idx), len(dis_iv_test))
 
 model = Ranker.DeepTermRankingListNet(args)
 if args.cuda:
     model = model.cuda()
 print(model)
 print([name for name, p in model.named_parameters()])
+
+# Load previous model to continue training
+if (args.rank_model_path and os.path.exists(args.rank_model_path)):
+    args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.load_state_dict(torch.load(args.rank_model_path, map_location=args.device), strict=True)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, betas=(0.9, 0.999))
@@ -227,7 +221,7 @@ best_on_dev = 0.0
 train_loss = 0
 train_logits = []
 train_labels = []
-print('Begin trainning...')
+print('Begin training...')
 for epoch in range(args.num_epochs):
     model.train()
     steps = 0
@@ -236,8 +230,10 @@ for epoch in range(args.num_epochs):
         # the batch size is the number of documents
         cur_raw_data = utils.random_neg_sampling([cur_sample], args.all_iv_terms, args.term_concept_dict, args.train_neg_num)
         cur_idx_data = utils.make_idx_data(cur_raw_data, args)
+        
+        # Generate Term List and One-Hot labels from CUI Synonyms graph
         t1_list, t2_list, onehot_labels = utils.preprocess(cur_idx_data[0], args)
-        # print([x.shape for x in t2_list])
+        
         onehot_labels = torch.FloatTensor(onehot_labels).reshape(1, -1)
 
         t1_list = [torch.tensor(x) for x in t1_list[:-1]] + [t1_list[-1]]
@@ -292,11 +288,11 @@ for epoch in range(args.num_epochs):
             all_iv = train_utils.evaluation(dis_iv_test_idx, model, criterion, args)
             print("--- Testing: All Dis IV Test {0}: {1:.5}".format(args.metric.upper(), all_iv))
 
-            all_oov = train_utils.evaluation(oov_test_idx, model, criterion, args)
-            print("--- Testing: All OOV Test {0}: {1:.5}".format(args.metric.upper(), all_oov))
+            # all_oov = train_utils.evaluation(oov_test_idx, model, criterion, args)
+            # print("--- Testing: All OOV Test {0}: {1:.5}".format(args.metric.upper(), all_oov))
 
-            all_oov = train_utils.evaluation(dis_oov_test_idx, model, criterion, args)
-            print("--- Testing: All Dis OOV Test {0}: {1:.5}".format(args.metric.upper(), all_oov))
+            # all_oov = train_utils.evaluation(dis_oov_test_idx, model, criterion, args)
+            # print("--- Testing: All Dis OOV Test {0}: {1:.5}".format(args.metric.upper(), all_oov))
 
             if args.save_best:
                 utils.save(model, args.save_dir, 'best', epoch)
