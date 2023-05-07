@@ -107,6 +107,7 @@ if os.path.exists(args.restore_para_file):
     args.ngram_to_id = model_dict['ngram_to_id']
     args.ngram_vocab_size = model_dict['ngram_vocab_size']
     args.ngram_embed_dim = model_dict['ngram_embed_dim']
+    
     # word
     args.word_hidden_dim = model_dict['word_hidden_dim']
     args.word_vocab_size = model_dict['word_vocab_size']

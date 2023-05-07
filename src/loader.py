@@ -1,3 +1,4 @@
+import io
 import os
 import re
 import sys
@@ -12,7 +13,39 @@ import torch
 
 import utils
 
+####################################
+# FUNCTION load_fastext_pretrain
+#   Parameters:
+#       - 'embed_filename': Filename of subword embeddings file
+#   Description:
+#       - Open embeddings and load them into Dictionary object, with the keys as subwords and the
+#         values as a numpy embedding vector. This function was added by CS598 team for parsing Fastext
+#         embeddings
+#   Returns:
+#       - Embedding Dictionary
+#   Embedding File Reference:
+#       - T. Mikolov, E. Grave, P. Bojanowski, C. Puhrsch, A. Joulin. Advances in Pre-Training Distributed Word Representations
+####################################
+def load_fastext_pretrain(embed_filename):
+    fin = io.open(embed_filename, 'r', encoding='utf-8', newline='\n', errors='ignore')
+    data = {}
+    for line in fin:
+        tokens = line.rstrip().split(' ')
+        data[tokens[0]] = np.array([float(x) for x in tokens[1:]])
+    return data
 
+####################################
+# FUNCTION load_pretrain_vec
+#   Parameters:
+#       - 'embed_filename': Filename of subword embeddings file
+#       - 'dim': Optional dimension for verifying that the desired embedding 
+#                dimension matches the embeddings dimension in the file
+#   Description:
+#       - Open txt embedding file and load the embedings into Dictionary object, with the keys as subwords and the
+#         values as a numpy embedding vector. 
+#   Returns:
+#       - Embedding Dictionary
+####################################
 def load_pretrain_vec(embed_filename, dim=None):
     word_dict = {}
     with open(embed_filename) as f:
@@ -32,7 +65,18 @@ def load_pretrain_vec(embed_filename, dim=None):
             # assert(len(word_dict[word]) == input_dim)
     return word_dict
 
-
+####################################
+# FUNCTION load_pretrain_graph_embed (unused)
+#   Parameters:
+#       - 'file_name': Filename of graph embeddings file
+#   Description:
+#       - Open file of graph nodes, writing a dictionary with node ID's (column zero) as key, 
+#         and remainder of columns as the value.
+#   Returns:
+#       - Node Dictionary
+#       - Header Row Col2
+#       - Header Row Col1
+####################################
 def load_pretrain_graph_embed(file_name):
     f = open(file_name).readlines()
     # print('Node embeddings: ', f[0].strip())
@@ -43,7 +87,15 @@ def load_pretrain_graph_embed(file_name):
 
     return node_dict, node_embed, node_num
 
+####################################
+# FUNCTION w2v_mapping
+#   Parameters:
+#       - 'list_phrases': Filename of graph embeddings file
+#   Description:
+#       - 
+#   Returns:
 
+####################################
 def w2v_mapping(list_phrases):
     phrases_list = [x.split() for x in list_phrases]
     words_list = [x.lower() for y in phrases_list for x in y]
@@ -127,14 +179,25 @@ def c2v_mapping(list_words):
     return char_vocab, char_to_id, id_to_char
 
 
+####################################
+# FUNCTION g2v_mapping_pretrain
+#   Parameters:
+#       - 'list_words': ?? - supposed to be individual words in terms? ... but is phrases
+#       - 'args': Args object with training session arguments (including path of ngram embedding file, and dimension)
+#   Description:
+#       - Loads in vectors 
+#   Returns:
+
+####################################
 def g2v_mapping_pretrain(list_words, args):
-    gram_dict = load_pretrain_vec(args.ngram_embed_path, args.ngram_embed_dim)
+    #gram_dict = load_pretrain_vec(args.ngram_embed_path, args.ngram_embed_dim)
+    gram_dict = load_fastext_pretrain(args.embed_filename)
     pretrain_gram_vocab = gram_dict.keys()  # 874474
 
     ngram_list = []
     list_words = list(set(list_words))
     for w in list_words:
-        ngram_list += get_single_ngrams(w, args.n_grams)
+        ngram_list += utils.get_single_ngrams(w, args.n_grams)
 
     # for n in args.n_grams:
     #     cur_list = [ngrams_pretrain(w, n) for w in list_words]

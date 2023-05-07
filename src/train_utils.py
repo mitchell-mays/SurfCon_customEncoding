@@ -13,7 +13,7 @@ def evaluation(data, model, criterion, args):
         logit_list = []
         label_list = []
         loss = 0
-        f = open(args.log_name, 'w')
+        #f = open(args.log_name, 'w')
         i = 0
         model.eval()
         for cur_sample in data:
@@ -41,6 +41,7 @@ def evaluation(data, model, criterion, args):
                 label_list.append(onehot_labels.numpy()[0])
 
             i += 1
+            '''
             if i < 1000 and args.logging:
                 t1 = cur_sample['t1_string']
                 cur_logits = F.softmax(torch.FloatTensor(cur_logits)).numpy()
@@ -48,7 +49,8 @@ def evaluation(data, model, criterion, args):
                     # print(t1, t2, logit)
                     f.write("{0}\t{1}\t{2:.5}\n".format(t1, t2, logit))
                 f.write('\n')
-        f.close()
+            '''
+        #f.close()
         # print('Finish storing!')
 
     return utils.eval_metric(logit_list, label_list, args.metric)

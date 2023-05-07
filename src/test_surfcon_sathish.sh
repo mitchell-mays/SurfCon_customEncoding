@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+python -u main_testing.py --restore_model_path='./saved_models/saved_pretrained/snapshot_epoch_200.pt' --rank_model_path='./saved_models/rank_model_perBin_1/best_epoch_2.pt' --num_results=10 --cand_terms_path='' --use_context=True --ngram_embed_path=wiki-news-300d-1M-subword.vec --neg_sampling=False
+#python -u main_testing.py --restore_model_path='./saved_models/saved_pretrained/snapshot_epoch_2000.pt' --rank_model_path='./saved_models/rank_model_perBin_1/paper_model_best_epoch_18.pt' --num_results=10 --cand_terms_path=''

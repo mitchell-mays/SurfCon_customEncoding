@@ -547,7 +547,8 @@ def adjust_learning_rate(optimizer, lr):
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
-
+# Re-wrote as Fastext expects ngrams as string values
+'''
 def ngrams_pretrain(string, n):
     assert(n > 0)
     # add START and END symbol
@@ -558,6 +559,12 @@ def ngrams_pretrain(string, n):
         char_list = list(string)
     ngrams = zip(*[char_list[i:] for i in range(n)])
     return ['{0}gram-{1}'.format(n, ''.join(ngram)) for ngram in ngrams]
+'''
+def ngrams_pretrain(string, n):
+    assert(n > 0)
+    char_list = list("<" + string + ">")
+    ngrams = zip(*[char_list[i:] for i in range(n)])
+    return [''.join(ngram) for ngram in ngrams]
 
 
 def get_single_ngrams(string, gram_num_list):

@@ -1,0 +1,199 @@
+Use GPU? True
+Model Parameters: 
+Dataset: Bin 1
+Train # negative samples: 50
+Test # negative samples: 100
+# contexts to aggregate: 50
+*****************************
+Begin loading data ...
+Data: # train: 10434, # val: 148, # iv test: 149, # dis iv test 38
+Data loaded!
+(54060, 128)
+-- Pre-stored parameters loaded! -- 
+Begin digitalizing ...
+148 149 38
+-- Word-Ngram Pretrained loaded! --
+DeepTermRankingListNet(
+  (dropout): Dropout(p=0, inplace=False)
+  (TermEncoder): ContextPredictionWordNGram(
+    (ngrams_embeddings): Embedding(102938, 100)
+    (w2v_embeddings): Embedding(84277, 100)
+    (fc_out): Linear(in_features=200, out_features=128, bias=True)
+    (context_out): Linear(in_features=128, out_features=54060, bias=False)
+    (out): LogSoftmax(dim=1)
+    (context_embeddings): Embedding(54060, 128)
+  )
+  (ContextPredictor): ContextPredictionWordNGram(
+    (ngrams_embeddings): Embedding(102938, 100)
+    (w2v_embeddings): Embedding(84277, 100)
+    (fc_out): Linear(in_features=200, out_features=128, bias=True)
+    (context_out): Linear(in_features=128, out_features=54060, bias=False)
+    (out): LogSoftmax(dim=1)
+    (context_embeddings): Embedding(54060, 128)
+  )
+  (context_features): Embedding(54060, 128)
+  (bi_c): Bilinear(in1_features=128, in2_features=128, out_features=1, bias=True)
+  (out): LogSoftmax(dim=1)
+)
+['att_mat', 'TermEncoder.ngrams_embeddings.weight', 'TermEncoder.w2v_embeddings.weight', 'TermEncoder.fc_out.weight', 'TermEncoder.fc_out.bias', 'TermEncoder.context_out.weight', 'TermEncoder.context_embeddings.weight', 'ContextPredictor.ngrams_embeddings.weight', 'ContextPredictor.w2v_embeddings.weight', 'ContextPredictor.fc_out.weight', 'ContextPredictor.fc_out.bias', 'ContextPredictor.context_out.weight', 'ContextPredictor.context_embeddings.weight', 'context_features.weight', 'bi_c.weight', 'bi_c.bias']
+Begin trainning...
+Epoch-0, steps-2000: Train MAP - 0.77669, Train Loss - 3.9471
+Epoch-0, steps-4000: Train MAP - 0.83654, Train Loss - 3.9418
+Epoch-0, steps-6000: Train MAP - 0.8703, Train Loss - 3.9425
+Epoch-0, steps-8000: Train MAP - 0.87966, Train Loss - 3.9408
+Epoch-0, steps-10000: Train MAP - 0.88368, Train Loss - 3.9401
+Epoch-0: All Dev MAP: 0.79423
+05/02/2023 02:00:12
+--- Testing: All IV Test MAP: 0.75308
+--- Testing: All Dis IV Test MAP: 0.46265
+Epoch-1, steps-2000: Train MAP - 0.91067, Train Loss - 3.939
+Epoch-1, steps-4000: Train MAP - 0.9296, Train Loss - 3.9397
+Epoch-1, steps-6000: Train MAP - 0.9236, Train Loss - 3.9374
+Epoch-1, steps-8000: Train MAP - 0.93369, Train Loss - 3.9379
+Epoch-1, steps-10000: Train MAP - 0.93782, Train Loss - 3.9374
+Epoch-1: All Dev MAP: 0.84275
+05/02/2023 02:06:50
+--- Testing: All IV Test MAP: 0.798
+--- Testing: All Dis IV Test MAP: 0.50138
+Epoch-2, steps-2000: Train MAP - 0.94803, Train Loss - 3.9385
+Epoch-2, steps-4000: Train MAP - 0.95923, Train Loss - 3.9375
+Epoch-2, steps-6000: Train MAP - 0.96118, Train Loss - 3.9354
+Epoch-2, steps-8000: Train MAP - 0.96091, Train Loss - 3.9357
+Epoch-2, steps-10000: Train MAP - 0.95623, Train Loss - 3.9356
+Epoch-2: All Dev MAP: 0.87176
+05/02/2023 02:13:31
+--- Testing: All IV Test MAP: 0.81945
+--- Testing: All Dis IV Test MAP: 0.52353
+Epoch-3, steps-2000: Train MAP - 0.97354, Train Loss - 3.9341
+Epoch-3, steps-4000: Train MAP - 0.97449, Train Loss - 3.9354
+Epoch-3, steps-6000: Train MAP - 0.9742, Train Loss - 3.9356
+Epoch-3, steps-8000: Train MAP - 0.97712, Train Loss - 3.9352
+Epoch-3, steps-10000: Train MAP - 0.97737, Train Loss - 3.9339
+Epoch-3: All Dev MAP: 0.87998
+05/02/2023 02:20:12
+--- Testing: All IV Test MAP: 0.83625
+--- Testing: All Dis IV Test MAP: 0.54487
+Epoch-4, steps-2000: Train MAP - 0.9802, Train Loss - 3.9347
+Epoch-4, steps-4000: Train MAP - 0.98132, Train Loss - 3.9341
+Epoch-4, steps-6000: Train MAP - 0.98134, Train Loss - 3.9338
+Epoch-4, steps-8000: Train MAP - 0.98791, Train Loss - 3.934
+Epoch-4, steps-10000: Train MAP - 0.98554, Train Loss - 3.9327
+Epoch-4: All Dev MAP: 0.90863
+05/02/2023 02:26:50
+--- Testing: All IV Test MAP: 0.84837
+--- Testing: All Dis IV Test MAP: 0.53542
+Epoch-5, steps-2000: Train MAP - 0.99005, Train Loss - 3.933
+Epoch-5, steps-4000: Train MAP - 0.98777, Train Loss - 3.9345
+Epoch-5, steps-6000: Train MAP - 0.98587, Train Loss - 3.9329
+Epoch-5, steps-8000: Train MAP - 0.99222, Train Loss - 3.9327
+Epoch-5, steps-10000: Train MAP - 0.99089, Train Loss - 3.9329
+Epoch-5: All Dev MAP: 0.91617
+05/02/2023 02:33:27
+--- Testing: All IV Test MAP: 0.8702
+--- Testing: All Dis IV Test MAP: 0.56144
+Epoch-6, steps-2000: Train MAP - 0.99331, Train Loss - 3.9325
+Epoch-6, steps-4000: Train MAP - 0.9937, Train Loss - 3.9327
+Epoch-6, steps-6000: Train MAP - 0.99328, Train Loss - 3.9328
+Epoch-6, steps-8000: Train MAP - 0.99472, Train Loss - 3.932
+Epoch-6, steps-10000: Train MAP - 0.99278, Train Loss - 3.9328
+Epoch-6: All Dev MAP: 0.9174
+05/02/2023 02:40:09
+--- Testing: All IV Test MAP: 0.86232
+--- Testing: All Dis IV Test MAP: 0.54806
+Epoch-7, steps-2000: Train MAP - 0.9945, Train Loss - 3.9313
+Epoch-7, steps-4000: Train MAP - 0.99413, Train Loss - 3.9322
+Epoch-7, steps-6000: Train MAP - 0.99546, Train Loss - 3.9319
+Epoch-7, steps-8000: Train MAP - 0.99664, Train Loss - 3.9321
+Epoch-7, steps-10000: Train MAP - 0.99612, Train Loss - 3.9333
+Epoch-7: All Dev MAP: 0.91333
+Epoch-8, steps-2000: Train MAP - 0.99774, Train Loss - 3.9313
+Epoch-8, steps-4000: Train MAP - 0.99429, Train Loss - 3.9306
+Epoch-8, steps-6000: Train MAP - 0.99517, Train Loss - 3.9326
+Epoch-8, steps-8000: Train MAP - 0.99682, Train Loss - 3.9316
+Epoch-8, steps-10000: Train MAP - 0.99581, Train Loss - 3.9315
+Epoch-8: All Dev MAP: 0.91539
+Epoch-9, steps-2000: Train MAP - 0.99754, Train Loss - 3.9315
+Epoch-9, steps-4000: Train MAP - 0.99757, Train Loss - 3.931
+Epoch-9, steps-6000: Train MAP - 0.99773, Train Loss - 3.9305
+Epoch-9, steps-8000: Train MAP - 0.99564, Train Loss - 3.9314
+Epoch-9, steps-10000: Train MAP - 0.99751, Train Loss - 3.9317
+Epoch-9: All Dev MAP: 0.92103
+05/02/2023 03:00:07
+--- Testing: All IV Test MAP: 0.87664
+--- Testing: All Dis IV Test MAP: 0.61757
+Epoch-10, steps-2000: Train MAP - 0.99801, Train Loss - 3.9311
+Epoch-10, steps-4000: Train MAP - 0.99878, Train Loss - 3.9305
+Epoch-10, steps-6000: Train MAP - 0.99816, Train Loss - 3.9309
+Epoch-10, steps-8000: Train MAP - 0.99892, Train Loss - 3.9306
+Epoch-10, steps-10000: Train MAP - 0.99762, Train Loss - 3.9312
+Epoch-10: All Dev MAP: 0.92237
+05/02/2023 03:06:57
+--- Testing: All IV Test MAP: 0.88258
+--- Testing: All Dis IV Test MAP: 0.60964
+Epoch-11, steps-2000: Train MAP - 0.99728, Train Loss - 3.9316
+Epoch-11, steps-4000: Train MAP - 0.99769, Train Loss - 3.9299
+Epoch-11, steps-6000: Train MAP - 0.9976, Train Loss - 3.9321
+Epoch-11, steps-8000: Train MAP - 0.99767, Train Loss - 3.9307
+Epoch-11, steps-10000: Train MAP - 0.99795, Train Loss - 3.9303
+Epoch-11: All Dev MAP: 0.9161
+Epoch-12, steps-2000: Train MAP - 0.99773, Train Loss - 3.9299
+Epoch-12, steps-4000: Train MAP - 0.99836, Train Loss - 3.9307
+Epoch-12, steps-6000: Train MAP - 0.99723, Train Loss - 3.9306
+Epoch-12, steps-8000: Train MAP - 0.99704, Train Loss - 3.931
+Epoch-12, steps-10000: Train MAP - 0.99829, Train Loss - 3.9304
+Epoch-12: All Dev MAP: 0.91834
+Epoch-13, steps-2000: Train MAP - 0.99863, Train Loss - 3.9299
+Epoch-13, steps-4000: Train MAP - 0.99846, Train Loss - 3.9302
+Epoch-13, steps-6000: Train MAP - 0.99689, Train Loss - 3.9298
+Epoch-13, steps-8000: Train MAP - 0.9981, Train Loss - 3.9308
+Epoch-13, steps-10000: Train MAP - 0.99807, Train Loss - 3.9304
+Epoch-13: All Dev MAP: 0.91938
+Epoch-14, steps-2000: Train MAP - 0.99841, Train Loss - 3.9307
+Epoch-14, steps-4000: Train MAP - 0.99852, Train Loss - 3.93
+Epoch-14, steps-6000: Train MAP - 0.99836, Train Loss - 3.9296
+Epoch-14, steps-8000: Train MAP - 0.99877, Train Loss - 3.9299
+Epoch-14, steps-10000: Train MAP - 0.99844, Train Loss - 3.9303
+Epoch-14: All Dev MAP: 0.9151
+Epoch-15, steps-2000: Train MAP - 0.99735, Train Loss - 3.9298
+Epoch-15, steps-4000: Train MAP - 0.99824, Train Loss - 3.9295
+Epoch-15, steps-6000: Train MAP - 0.99855, Train Loss - 3.93
+Epoch-15, steps-8000: Train MAP - 0.99919, Train Loss - 3.9302
+Epoch-15, steps-10000: Train MAP - 0.99705, Train Loss - 3.93
+Epoch-15: All Dev MAP: 0.91575
+Epoch-16, steps-2000: Train MAP - 0.99941, Train Loss - 3.93
+Epoch-16, steps-4000: Train MAP - 0.99897, Train Loss - 3.9307
+Epoch-16, steps-6000: Train MAP - 0.99879, Train Loss - 3.9299
+Epoch-16, steps-8000: Train MAP - 0.99839, Train Loss - 3.929
+Epoch-16, steps-10000: Train MAP - 0.99861, Train Loss - 3.9298
+Epoch-16: All Dev MAP: 0.91704
+Epoch-17, steps-2000: Train MAP - 0.99912, Train Loss - 3.9296
+Epoch-17, steps-4000: Train MAP - 0.99903, Train Loss - 3.9305
+Epoch-17, steps-6000: Train MAP - 0.99878, Train Loss - 3.9295
+Epoch-17, steps-8000: Train MAP - 0.99793, Train Loss - 3.9295
+Epoch-17, steps-10000: Train MAP - 0.99829, Train Loss - 3.9292
+Epoch-17: All Dev MAP: 0.91766
+Epoch-18, steps-2000: Train MAP - 0.9989, Train Loss - 3.9295
+Epoch-18, steps-4000: Train MAP - 0.99841, Train Loss - 3.9295
+Epoch-18, steps-6000: Train MAP - 0.99869, Train Loss - 3.9295
+Epoch-18, steps-8000: Train MAP - 0.99838, Train Loss - 3.9298
+Epoch-18, steps-10000: Train MAP - 0.99893, Train Loss - 3.9294
+Epoch-18: All Dev MAP: 0.90835
+Epoch-19, steps-2000: Train MAP - 0.99785, Train Loss - 3.9303
+Epoch-19, steps-4000: Train MAP - 0.99792, Train Loss - 3.929
+Epoch-19, steps-6000: Train MAP - 0.99881, Train Loss - 3.9293
+Epoch-19, steps-8000: Train MAP - 0.99897, Train Loss - 3.9296
+Epoch-19, steps-10000: Train MAP - 0.99925, Train Loss - 3.9295
+Epoch-19: All Dev MAP: 0.9117
+Epoch-20, steps-2000: Train MAP - 0.99853, Train Loss - 3.9288
+Epoch-20, steps-4000: Train MAP - 0.9983, Train Loss - 3.9295
+Epoch-20, steps-6000: Train MAP - 0.99914, Train Loss - 3.9289
+Epoch-20, steps-8000: Train MAP - 0.99931, Train Loss - 3.9302
+Epoch-20, steps-10000: Train MAP - 0.99933, Train Loss - 3.9293
+Epoch-20: All Dev MAP: 0.91539
+Epoch-21, steps-2000: Train MAP - 0.99907, Train Loss - 3.9293
+Epoch-21, steps-4000: Train MAP - 0.99947, Train Loss - 3.929
+Epoch-21, steps-6000: Train MAP - 0.99866, Train Loss - 3.9301
+Epoch-21, steps-8000: Train MAP - 0.99955, Train Loss - 3.9295
+Epoch-21, steps-10000: Train MAP - 0.99872, Train Loss - 3.9287
+Epoch-21: All Dev MAP: 0.90646
+Early stop at 21 epoch.
